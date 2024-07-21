@@ -4,8 +4,6 @@
  * @author NikLever / http://niklever.com
  */
 
- let audioElement = new Audio();
-audioElement.src = 'C:/Users/ASUS/Documents/GitHub/DraptorCvX/audio/ENHYPENFatalTrouble.mp3';
 
 class VRButton{
 
@@ -88,10 +86,6 @@ class VRButton{
             currentSession = session;
             
             if (self.onSessionStart !== undefined) self.onSessionStart();
-
-            audioElement.play().then(() => {
-        audioElement.loop = true;
-      });
 
         }
 
