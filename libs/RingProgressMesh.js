@@ -45,7 +45,7 @@ void main (void)
   vec4 arcColor = vec4(1.0, 0.0, 0.0, 1.0);
   vec2 center = vec2(0.5);
   vec4 color = vec4(0.0);
-  color += circle(vUv, center, 0.5) * bgColor;
+  color += step(vUv.x - left, 0.0) * step(right - vUv.x, 0.0) * step(vUv.y - bottom, 0.0) * step(top - vUv.y, 0.0) * rectangleColor;
   color += arc(vUv, center, 0.4, uProgress) * arcColor;
   gl_FragColor = color; 
 }`
