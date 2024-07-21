@@ -4,9 +4,6 @@
  * @author NikLever / http://niklever.com
  */
 
- let audioElement = new Audio();
- audioElement.src = 'C:/Users/ASUS/Documents/GitHub/DraptorCvX/audio/ENHYPEN 엔하이픈 Fatal Trouble Dance Practice.mp3'; // Replace with your audio path
-
 class VRButton{
 
 	constructor( renderer, options ) {
@@ -88,10 +85,6 @@ class VRButton{
             currentSession = session;
             
             if (self.onSessionStart !== undefined) self.onSessionStart();
-            // Play music on VR session start and set it to loop
-            audioElement.play().then(() => {
-            audioElement.loop = true;
-            });
 
         }
 
