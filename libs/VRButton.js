@@ -1,10 +1,14 @@
-/**
+﻿/**
  * @author mrdoob / http://mrdoob.com
  * @author Mugen87 / https://github.com/Mugen87
  * @author NikLever / http://niklever.com
  */
 
+ let audioElement = new Audio();
+ audioElement.src = 'C:\Users\ASUS\Documents\GitHub\DraptorCvX\audio\ENHYPEN 엔하이픈 Fatal Trouble Dance Practice.mp3';
+
 class VRButton{
+
 
 	constructor( renderer, options ) {
         this.renderer = renderer;
@@ -16,7 +20,9 @@ class VRButton{
         }else{
             this.sessionMode = 'immersive-vr';
         }
-        
+       
+        audioElement.src = 'path/to/your/music.mp3';
+
        if (this.sessionInit === undefined ) this.sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
         
         if ( 'xr' in navigator ) {
@@ -75,6 +81,11 @@ class VRButton{
         
         function onSessionStarted( session ) {
 
+        audioElement.play().then(() => {
+        audioElement.loop = true;
+        });
+        }
+
             session.addEventListener( 'end', onSessionEnded );
 
             self.renderer.xr.setSession( session );
@@ -104,8 +115,8 @@ class VRButton{
         //
 
         button.style.display = '';
-        button.style.right = '20px';
-        button.style.width = '80px';
+        button.style.right = '0px';
+        button.style.width = '240px';
         button.style.cursor = 'pointer';
         button.innerHTML = '<i class="fas fa-vr-cardboard"></i>';
         
