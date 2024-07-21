@@ -1,8 +1,8 @@
-// Import the VRButton class (assuming it's in a separate file)
+﻿// Import the VRButton class (assuming it's in a separate file)
 import { VRButton } from './VRButton.js';
 
 const audioElement = document.createElement('audio');
-audioElement.src = 'C:/Users/ASUS/Documents/GitHub/DraptorCvX/audio/your_music.mp3'; // Replace with your path
+audioElement.src = 'C:/Users/ASUS/Documents/GitHub/DraptorCvX/audio/ENHYPENFatalTrouble.mp3'; // Replace with your path
 audioElement.loop = true; // Set loop playback by default
 
 let isMusicPlaying = false;
