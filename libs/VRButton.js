@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @author mrdoob / http://mrdoob.com
  * @author Mugen87 / https://github.com/Mugen87
  * @author NikLever / http://niklever.com
@@ -104,8 +104,8 @@ class VRButton{
         //
 
         button.style.display = '';
-        button.style.right = 'calc(50% - 160px)';
-        button.style.width = '320px';
+        button.style.right = '20px';
+        button.style.width = '80px';
         button.style.cursor = 'pointer';
         button.innerHTML = '<i class="fas fa-vr-cardboard"></i>';
         
