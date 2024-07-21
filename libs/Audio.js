@@ -1,23 +1,26 @@
-const audioElement = document.getElementById('audio-element');
-const playPauseBtn = document.getElementById('play-pause-btn');
-const loopBtn = document.getElementById('loop-btn');
+// Import the VRButton class (assuming it's in a separate file)
+import { VRButton } from './VRButton.js';
 
-let isPlaying = false;
-let isLooping = false;
+const audioElement = document.createElement('audio');
+audioElement.src = 'C:/Users/ASUS/Documents/GitHub/DraptorCvX/audio/your_music.mp3'; // Replace with your path
+audioElement.loop = true; // Set loop playback by default
 
-playPauseBtn.addEventListener('click', () => {
-  if (isPlaying) {
+let isMusicPlaying = false;
+
+const musicPlayPauseBtn = document.getElementById('music-play-pause-btn');
+
+musicPlayPauseBtn.addEventListener('click', () => {
+  if (isMusicPlaying) {
     audioElement.pause();
-    playPauseBtn.textContent = 'Play';
+    musicPlayPauseBtn.textContent = 'Play Music';
   } else {
     audioElement.play();
-    playPauseBtn.textContent = 'Pause';
+    musicPlayPauseBtn.textContent = 'Pause Music';
   }
-  isPlaying = !isPlaying;
+  isMusicPlaying = !isMusicPlaying;
 });
 
-loopBtn.addEventListener('click', () => {
-  isLooping = !isLooping;
-  audioElement.loop = isLooping;
-  loopBtn.style.backgroundColor = isLooping ? '#4CAF50' : '#cccccc';
-});
+// Create the VR button instance and position it within the container
+const vrButtonContainer = document.getElementById('vr-button-container');
+const vrButton = new VRButton( /* renderer object */, /* options object */ );
+vrButtonContainer.appendChild(vrButton);
