@@ -4,200 +4,71 @@
  * @author NikLever / http://niklever.com
  */
 
-class VRButton{
+let audioElement = new Audio();
+audioElement.src = 'C:/Users/ASUS/Documents/GitHub/DraptorCvX/audio/ENHYPEN 엔하이픈 Fatal Trouble Dance Practice.mp3'; // Replace with your audio path
 
-	constructor( renderer, options ) {
-        this.renderer = renderer;
-        if (options !== undefined){
-            this.onSessionStart = options.onSessionStart;
-            this.onSessionEnd = options.onSessionEnd;
-            this.sessionInit = options.sessionInit;
-            this.sessionMode = ( options.inline !== undefined && options.inline ) ? 'inline' : 'immersive-vr';
-        }else{
-            this.sessionMode = 'immersive-vr';
-        }
-        
-       if (this.sessionInit === undefined ) this.sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
-        
-        if ( 'xr' in navigator ) {
+class VRButton {
 
-			const button = document.createElement( 'button' );
-			button.style.display = 'none';
-            button.style.height = '40px';
-            
-			navigator.xr.isSessionSupported( this.sessionMode ).then( ( supported ) => {
+  constructor(renderer, options) {
+    this.renderer = renderer;
+    if (options !== undefined) {
+      this.onSessionStart = options.onSessionStart;
+      this.onSessionEnd = options.onSessionEnd;
+      this.sessionInit = options.sessionInit;
+      this.sessionMode = (options.inline !== undefined && options.inline) ? 'inline' : 'immersive-vr';
+    } else {
+      this.sessionMode = 'immersive-vr';
+    }
+    
+    if (this.sessionInit === undefined) this.sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
+  }
 
-				supported ? this.showEnterVR( button ) : this.showWebXRNotFound( button );
-                if (options && options.vrStatus) options.vrStatus( supported );
-                
-			} );
-            
-            document.body.appendChild( button );
+  showEnterVR(button) {
 
-		} else {
+    let currentSession = null;
+    const self = this;
+    
+    this.stylizeElement(button, true, 30, true);
+    
+    function onSessionStarted(session) {
 
-			const message = document.createElement( 'a' );
+      session.addEventListener('end', onSessionEnded);
 
-			if ( window.isSecureContext === false ) {
+      self.renderer.xr.setSession(session);
+      self.stylizeElement(button, false, 12, true);
+      
+      button.textContent = 'EXIT VR';
 
-				message.href = document.location.href.replace( /^http:/, 'https:' );
-				message.innerHTML = 'WEBXR NEEDS HTTPS'; 
+      currentSession = session;
+      
+      if (self.onSessionStart !== undefined) self.onSessionStart();
 
-			} else {
-
-				message.href = 'https://immersiveweb.dev/';
-				message.innerHTML = 'WEBXR NOT AVAILABLE';
-
-			}
-
-			message.style.left = '0px';
-			message.style.width = '100%';
-			message.style.textDecoration = 'none';
-
-			this.stylizeElement( message, false );
-            message.style.bottom = '0px';
-            message.style.opacity = '1';
-            
-            document.body.appendChild ( message );
-            
-            if (options.vrStatus) options.vrStatus( false );
-
-		}
-
+      // Play music on VR session start and set it to loop
+      audioElement.play().then(() => {
+        audioElement.loop = true;
+      });
     }
 
-	showEnterVR( button ) {
+    function onSessionEnded( ) {
 
-        let currentSession = null;
-        const self = this;
-        
-        this.stylizeElement( button, true, 30, true );
-        
-        function onSessionStarted( session ) {
+      currentSession.removeEventListener('end', onSessionEnded);
 
-            session.addEventListener( 'end', onSessionEnded );
+      self.stylizeElement(button, true, 12, true);
+      button.textContent = 'ENTER VR';
 
-            self.renderer.xr.setSession( session );
-            self.stylizeElement( button, false, 12, true );
-            
-            button.textContent = 'EXIT VR';
+      currentSession = null;
+      
+      if (self.onSessionEnd !== undefined) self.onSessionEnd();
 
-            currentSession = session;
-            
-            if (self.onSessionStart !== undefined) self.onSessionStart();
-
-        }
-
-        function onSessionEnded( ) {
-
-            currentSession.removeEventListener( 'end', onSessionEnded );
-
-            self.stylizeElement( button, true, 12, true );
-            button.textContent = 'ENTER VR';
-
-            currentSession = null;
-            
-            if (self.onSessionEnd !== undefined) self.onSessionEnd();
-
-        }
-
-        //
-
-        button.style.display = '';
-        button.style.right = '20px';
-        button.style.width = '80px';
-        button.style.cursor = 'pointer';
-        button.innerHTML = '<i class="fas fa-vr-cardboard"></i>';
-        
-
-        button.onmouseenter = function () {
-            
-            button.style.fontSize = '12px'; 
-            button.textContent = (currentSession===null) ? 'ENTER VR' : 'EXIT VR';
-            button.style.opacity = '1.0';
-
-        };
-
-        button.onmouseleave = function () {
-            
-            button.style.fontSize = '30px'; 
-            button.innerHTML = '<i class="fas fa-vr-cardboard"></i>';
-            button.style.opacity = '0.5';
-
-        };
-
-        button.onclick = function () {
-
-            if ( currentSession === null ) {
-
-                // WebXR's requestReferenceSpace only works if the corresponding feature
-                // was requested at session creation time. For simplicity, just ask for
-                // the interesting ones as optional features, but be aware that the
-                // requestReferenceSpace call will fail if it turns out to be unavailable.
-                // ('local' is always available for immersive sessions and doesn't need to
-                // be requested separately.)
-
-                navigator.xr.requestSession( self.sessionMode, self.sessionInit ).then( onSessionStarted );
-
-            } else {
-
-                currentSession.end();
-
-            }
-
-        };
-
+      // Optional: Pause or stop audio on VR session end
+      // audioElement.pause();
+      // audioElement.currentTime = 0; // Reset playback time
     }
 
-    disableButton(button) {
+    // ... existing button styling and event listeners ...
+  }
 
-        button.style.cursor = 'auto';
-        button.style.opacity = '0.5';
-        
-        button.onmouseenter = null;
-        button.onmouseleave = null;
-
-        button.onclick = null;
-
-    }
-
-    showWebXRNotFound( button ) {
-        this.stylizeElement( button, false );
-        
-        this.disableButton(button);
-
-        button.style.display = '';
-        button.style.width = '100%';
-        button.style.right = '0px';
-        button.style.bottom = '0px';
-        button.style.border = '';
-        button.style.opacity = '1';
-        button.style.fontSize = '13px';
-        button.textContent = 'VR NOT SUPPORTED';
-        
-        
-
-    }
-
-    stylizeElement( element, active = true, fontSize = 13, ignorePadding = false ) {
-
-        element.style.position = 'absolute';
-        element.style.bottom = '20px';
-        if (!ignorePadding) element.style.padding = '12px 6px';
-        element.style.border = '1px solid #fff';
-        element.style.borderRadius = '4px';
-        element.style.background = (active) ? 'rgba(20,150,80,1)' : 'rgba(180,20,20,1)';
-        element.style.color = '#fff';
-        element.style.font = `normal ${fontSize}px sans-serif`;
-        element.style.textAlign = 'center';
-        element.style.opacity = '0.5';
-        element.style.outline = 'none';
-        element.style.zIndex = '999';
-
-    }
-
-		
-
-};
+  // ... existing other methods ...
+}
 
 export { VRButton };
