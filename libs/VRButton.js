@@ -1,102 +1,96 @@
-/**
- * @author mrdoob / http://mrdoob.com
- * @author Mugen87 / https://github.com/Mugen87
- * @author NikLever / http://niklever.com
- */
+class VRButton {
 
-class VRButton{
-
-	constructor( renderer, options ) {
+    constructor(renderer, options) {
         this.renderer = renderer;
-        if (options !== undefined){
+        if (options !== undefined) {
             this.onSessionStart = options.onSessionStart;
             this.onSessionEnd = options.onSessionEnd;
             this.sessionInit = options.sessionInit;
-            this.sessionMode = ( options.inline !== undefined && options.inline ) ? 'inline' : 'immersive-vr';
-        }else{
+            this.sessionMode = (options.inline !== undefined && options.inline) ? 'inline' : 'immersive-vr';
+        } else {
             this.sessionMode = 'immersive-vr';
         }
-        
-       if (this.sessionInit === undefined ) this.sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
-        
-        if ( 'xr' in navigator ) {
 
-			const button = document.createElement( 'button' );
-			button.style.display = 'none';
-            button.style.height = '40px';
-            
-			navigator.xr.isSessionSupported( this.sessionMode ).then( ( supported ) => {
+        if (this.sessionInit === undefined) this.sessionInit = { optionalFeatures: ['local-floor', 'bounded-floor'] };
 
-				supported ? this.showEnterVR( button ) : this.showWebXRNotFound( button );
-                if (options && options.vrStatus) options.vrStatus( supported );
-                
-			} );
-            
-            document.body.appendChild( button );
+        if ('xr' in navigator) {
 
-		} else {
+            const button = document.createElement('button');
+            button.style.display = 'none';
+            button.style.height = '160px';  // 4 times the original height
 
-			const message = document.createElement( 'a' );
+            navigator.xr.isSessionSupported(this.sessionMode).then((supported) => {
 
-			if ( window.isSecureContext === false ) {
+                supported ? this.showEnterVR(button) : this.showWebXRNotFound(button);
+                if (options && options.vrStatus) options.vrStatus(supported);
 
-				message.href = document.location.href.replace( /^http:/, 'https:' );
-				message.innerHTML = 'WEBXR NEEDS HTTPS'; 
+            });
 
-			} else {
+            document.body.appendChild(button);
 
-				message.href = 'https://immersiveweb.dev/';
-				message.innerHTML = 'WEBXR NOT AVAILABLE';
+        } else {
 
-			}
+            const message = document.createElement('a');
 
-			message.style.left = '0px';
-			message.style.width = '100%';
-			message.style.textDecoration = 'none';
+            if (window.isSecureContext === false) {
 
-			this.stylizeElement( message, false );
+                message.href = document.location.href.replace(/^http:/, 'https:');
+                message.innerHTML = 'WEBXR NEEDS HTTPS';
+
+            } else {
+
+                message.href = 'https://immersiveweb.dev/';
+                message.innerHTML = 'WEBXR NOT AVAILABLE';
+
+            }
+
+            message.style.left = '0px';
+            message.style.width = '100%';
+            message.style.textDecoration = 'none';
+
+            this.stylizeElement(message, false);
             message.style.bottom = '0px';
             message.style.opacity = '1';
-            
-            document.body.appendChild ( message );
-            
-            if (options.vrStatus) options.vrStatus( false );
 
-		}
+            document.body.appendChild(message);
+
+            if (options.vrStatus) options.vrStatus(false);
+
+        }
 
     }
 
-	showEnterVR( button ) {
+    showEnterVR(button) {
 
         let currentSession = null;
         const self = this;
-        
-        this.stylizeElement( button, true, 30, true );
-        
-        function onSessionStarted( session ) {
 
-            session.addEventListener( 'end', onSessionEnded );
+        this.stylizeElement(button, true, 120, true); // 4 times the original font size
 
-            self.renderer.xr.setSession( session );
-            self.stylizeElement( button, false, 12, true );
-            
+        function onSessionStarted(session) {
+
+            session.addEventListener('end', onSessionEnded);
+
+            self.renderer.xr.setSession(session);
+            self.stylizeElement(button, false, 48, true); // 4 times the original font size
+
             button.textContent = 'EXIT VR';
 
             currentSession = session;
-            
+
             if (self.onSessionStart !== undefined) self.onSessionStart();
 
         }
 
-        function onSessionEnded( ) {
+        function onSessionEnded() {
 
-            currentSession.removeEventListener( 'end', onSessionEnded );
+            currentSession.removeEventListener('end', onSessionEnded);
 
-            self.stylizeElement( button, true, 12, true );
+            self.stylizeElement(button, true, 48, true); // 4 times the original font size
             button.textContent = 'ENTER VR';
 
             currentSession = null;
-            
+
             if (self.onSessionEnd !== undefined) self.onSessionEnd();
 
         }
@@ -104,23 +98,24 @@ class VRButton{
         //
 
         button.style.display = '';
-        button.style.right = 'calc(50% - 160px)';
-        button.style.width = '320px';
+        button.style.left = '50%';  // Center horizontally
+        button.style.top = '50%';   // Center vertically
+        button.style.transform = 'translate(-50%, -50%)';  // Adjust for true center
+        button.style.width = '320px';  // 4 times the original width
         button.style.cursor = 'pointer';
         button.innerHTML = '<i class="fas fa-vr-cardboard"></i>';
-        
 
         button.onmouseenter = function () {
-            
-            button.style.fontSize = '12px'; 
-            button.textContent = (currentSession===null) ? 'ENTER VR' : 'EXIT VR';
+
+            button.style.fontSize = '48px';  // 4 times the original font size
+            button.textContent = (currentSession === null) ? 'ENTER VR' : 'EXIT VR';
             button.style.opacity = '1.0';
 
         };
 
         button.onmouseleave = function () {
-            
-            button.style.fontSize = '30px'; 
+
+            button.style.fontSize = '120px';  // 4 times the original font size
             button.innerHTML = '<i class="fas fa-vr-cardboard"></i>';
             button.style.opacity = '0.5';
 
@@ -128,16 +123,9 @@ class VRButton{
 
         button.onclick = function () {
 
-            if ( currentSession === null ) {
+            if (currentSession === null) {
 
-                // WebXR's requestReferenceSpace only works if the corresponding feature
-                // was requested at session creation time. For simplicity, just ask for
-                // the interesting ones as optional features, but be aware that the
-                // requestReferenceSpace call will fail if it turns out to be unavailable.
-                // ('local' is always available for immersive sessions and doesn't need to
-                // be requested separately.)
-
-                navigator.xr.requestSession( self.sessionMode, self.sessionInit ).then( onSessionStarted );
+                navigator.xr.requestSession(self.sessionMode, self.sessionInit).then(onSessionStarted);
 
             } else {
 
@@ -153,7 +141,7 @@ class VRButton{
 
         button.style.cursor = 'auto';
         button.style.opacity = '0.5';
-        
+
         button.onmouseenter = null;
         button.onmouseleave = null;
 
@@ -161,9 +149,9 @@ class VRButton{
 
     }
 
-    showWebXRNotFound( button ) {
-        this.stylizeElement( button, false );
-        
+    showWebXRNotFound(button) {
+        this.stylizeElement(button, false);
+
         this.disableButton(button);
 
         button.style.display = '';
@@ -172,18 +160,15 @@ class VRButton{
         button.style.bottom = '0px';
         button.style.border = '';
         button.style.opacity = '1';
-        button.style.fontSize = '13px';
+        button.style.fontSize = '52px'; // 4 times the original font size
         button.textContent = 'VR NOT SUPPORTED';
-        
-        
 
     }
 
-    stylizeElement( element, active = true, fontSize = 13, ignorePadding = false ) {
-
+    stylizeElement(element, active = true, fontSize = 52, ignorePadding = false) { // Default font size is now 4 times the original
         element.style.position = 'absolute';
         element.style.bottom = '20px';
-        if (!ignorePadding) element.style.padding = '12px 6px';
+        if (!ignorePadding) element.style.padding = '48px 24px';  // 4 times the original padding
         element.style.border = '1px solid #fff';
         element.style.borderRadius = '4px';
         element.style.background = (active) ? 'rgba(20,150,80,1)' : 'rgba(180,20,20,1)';
@@ -196,8 +181,4 @@ class VRButton{
 
     }
 
-		
-
 };
-
-export { VRButton };
